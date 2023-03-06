@@ -4,15 +4,27 @@ using UnityEngine;
 
 public class BreakBallWin : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static BreakBallWin instance;
+    [SerializeField] private Transform ballsCollection;
+    [SerializeField] private GameObject breakBallFrefab;
+    public bool breakBall = false;
+    private void Awake()
     {
-        
+        instance = this;
     }
-
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        Debug.Log(other.gameObject.tag);
+        if (other.gameObject.CompareTag("WinPoint"))
+        {
+            Debug.Log("dam vao win point tai player");
+            StartCoroutine(BreakBall());
+        }
+    }
+    IEnumerator BreakBall()
+    {
+        yield return new WaitForSeconds(10f);
+        breakBall = true;
+
     }
 }

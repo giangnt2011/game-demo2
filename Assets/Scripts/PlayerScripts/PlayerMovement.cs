@@ -14,7 +14,7 @@ namespace PlayerScripts
         [SerializeField] private float stepWin;
         [SerializeField] private Slider Sliderslider;
         bool win = false;
-        private bool isMoving = true;
+        private bool isMoving = false;
         
         private Touch touch;
         private float deltaTouchBefore = 0f;
@@ -103,7 +103,6 @@ namespace PlayerScripts
         public void MoveToWinPoint(Vector3 End)
         {
             win = true;
-            Debug.Log(win);
             StartCoroutine(SwitchAnimation());
         
         }

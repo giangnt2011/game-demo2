@@ -11,12 +11,8 @@ public class WinPoint : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        // if (!other.gameObject.CompareTag("Ball")) return;
-        // Debug.Log("dam vao winpoint");
-        // PlayerMovement.instance.MoveToWinPoint(end.transform.position);
         if (other.gameObject.CompareTag("Ball"))
         {
-            Debug.Log(other.gameObject.tag);
             PlayerMovement.instance.MoveToWinPoint(end.position);
         }
     }
