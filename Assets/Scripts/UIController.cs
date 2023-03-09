@@ -13,12 +13,13 @@ public class UIController : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        //ScoreText.text = PlayerPrefs.GetInt("score").ToString();
     }
     
 
     public void SetScoreTxt(int score)
     {
-        ScoreText.text = score.ToString();
+        ScoreText.text = (PlayerPrefs.GetInt("score") + score).ToString();
     }
 
     public int GetScoreTxt()

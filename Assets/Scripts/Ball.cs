@@ -9,7 +9,12 @@ public class Ball : MonoBehaviour
     [SerializeField] private Transform gameObjectTransform;
     [SerializeField] private Transform ballCollection;
     [SerializeField] private Transform ballPool;
+    private Animator _animator;
 
+    private void Awake()
+    {
+        _animator = gameObject.GetComponentInChildren<Animator>();
+    }
     private void OnDisable()
     {
         Destroy(gameObject);
@@ -22,6 +27,7 @@ public class Ball : MonoBehaviour
             collision.gameObject.TryGetComponent<Ball>(out var ball);
             if (!ball.hasCollided)
             {
+                int ballColChildCount = ballCollection.childCount;
                 Vector3 lastChildPosition = ballCollection.GetChild(ballCollection.childCount - 1).transform.position;
 
                 Vector3 newGamePo = gameObjectTransform.position;
@@ -33,6 +39,13 @@ public class Ball : MonoBehaviour
                 collision.gameObject.transform.position = lastChildPosition;
             
                 ball.hasCollided = true;
+
+                _animator.enabled = true;
+                if(ballColChildCount % 2 == 0)
+                {
+                    SetAnimBallScroll(BallAnimState.ScrollBack);
+                }
+                
             }
         }
 
@@ -42,6 +55,7 @@ public class Ball : MonoBehaviour
             if (!wall.hasCollided)
             {
                 transform.SetParent(ballPool, true);
+                _animator.enabled = false;
             }
             
         }
@@ -54,4 +68,24 @@ public class Ball : MonoBehaviour
         ballPool = ballP;
 
     }
+    private void SetAnimBallScroll(BallAnimState state)
+    {
+        switch (state)
+        {
+            case (BallAnimState.Scroll):
+                _animator.SetBool("RollBack", false);
+                break;
+            case (BallAnimState.ScrollBack):
+                _animator.SetBool("RollBack", true);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+public enum BallAnimState
+{
+    Scroll,
+    ScrollBack
 }

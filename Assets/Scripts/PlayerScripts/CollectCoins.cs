@@ -8,9 +8,20 @@ public class CollectCoins : MonoBehaviour
     [SerializeField] private Text Score;
     private int CoinScore = 0;
 
-    private void Start()
+    private void OnEnable()
     {
-        UIController.instance.SetScoreTxt(0);
+        EventDispatcher.Instance.RegisterListener(EventID.LoadLevel, HandleEventLoadLevel);
+    }
+    private void OnDisable()
+    {
+        EventDispatcher.Instance.RegisterListener(EventID.LoadLevel, HandleEventLoadLevel);
+    }
+
+    private void HandleEventLoadLevel(object param)
+    {
+        int oldScore = PlayerPrefs.GetInt("score");
+        UIController.instance.SetScoreTxt(oldScore);
+        CoinScore = oldScore;
     }
 
     private void OnTriggerEnter(Collider other)

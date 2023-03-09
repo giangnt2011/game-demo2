@@ -19,6 +19,7 @@ namespace PlayerScripts
         [SerializeField] private GameObject ReplayTxt;
         [SerializeField] private GameObject[] BallPrefabs;
         [SerializeField] private Transform StickmanTrans;
+        [SerializeField] private Transform SparkingSmoke;
 
         public bool win = false;
         public bool RotateCamera = false;
@@ -27,6 +28,7 @@ namespace PlayerScripts
         private Touch touch;
         private float deltaTouchBefore = 0f;
         public Vector3 EndPoint;
+        //private int frameCount = 0;
 
 
 
@@ -68,13 +70,16 @@ namespace PlayerScripts
                 Win();
                 return;
             }
-            
-            if (isMoving && ballCollectionTransform.childCount > 1)
-            {
-                GameObject game = Instantiate(SmokeMovingPrefab, ballCollectionTransform.GetChild(ballCollectionTransform.childCount - 1).position,
-                    new Quaternion(0, 1, 1, 1));
-                Destroy(game, 0.5f);
-            }
+            //frameCount++;
+            //Debug.Log(frameCount);
+            //if (isMoving && ballCollectionTransform.childCount > 0 && frameCount > 20)
+            //{
+            //    Debug.Log(frameCount);
+            //    GameObject game = Instantiate(SmokeMovingPrefab, ballCollectionTransform.GetChild(ballCollectionTransform.childCount - 1).position,
+            //        new Quaternion(0, 1, 1, 1));
+            //    Destroy(game, 1f);
+            //    frameCount = 0;
+            //}
             
             if(Input.GetMouseButtonDown(0))
             {
@@ -139,6 +144,7 @@ namespace PlayerScripts
             position = Vector3.MoveTowards(position,new Vector3(Sliderslider.value, 0, position.z + 0.5f), speed * Time.deltaTime);
             transform.position = position;
             SetAnimation(AnimState.Run);
+
         }
         
         private void Win()
@@ -170,6 +176,7 @@ namespace PlayerScripts
 
         private void HandleEventLoadLevel(object param)
         {
+            SparkingSmoke.gameObject.SetActive(false);
             //set vi tri
             LevelController currentLevel = (LevelController)param;
             SetEndPoint(currentLevel.EndPlayer.position);
@@ -191,6 +198,7 @@ namespace PlayerScripts
             win = false;
             RotateCamera = false;
             isMoving= false;
+            SparkingSmoke.gameObject.SetActive(true);
 
             CameraFollow.instance.ResetCamera();
 
