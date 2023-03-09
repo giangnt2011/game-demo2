@@ -7,6 +7,7 @@ public class Coin : MonoBehaviour
     float count = 0.0f;
     Rigidbody m_Rigidbody;
     Vector3[] point = new Vector3[3];
+    private bool hasCollidedPrivate = false;
     public bool hasCollided = false;
     void Start()
     {
@@ -16,7 +17,7 @@ public class Coin : MonoBehaviour
 
     private void Update()
     {
-        if (hasCollided)
+        if (hasCollidedPrivate)
         {
             if (count < 1.0f)
             {
@@ -35,7 +36,7 @@ public class Coin : MonoBehaviour
             point[0] = transform.position;
             point[2] = transform.position - new Vector3(0, 0, 7);
             point[1] = point[0] + (point[2] - point[0]) / 2 + Vector3.up * 7.0f;
-            hasCollided = true;
+            hasCollidedPrivate = true;
             var constr = m_Rigidbody.constraints;
             m_Rigidbody.constraints = RigidbodyConstraints.FreezePositionX;
         }

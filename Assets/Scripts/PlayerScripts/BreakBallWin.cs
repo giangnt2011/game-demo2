@@ -17,7 +17,6 @@ public class BreakBallWin : MonoBehaviour
         Debug.Log(other.gameObject.tag);
         if (other.gameObject.CompareTag("WinPoint"))
         {
-            Debug.Log("dam vao win point tai player");
             StartCoroutine(BreakBall());
         }
     }
@@ -25,6 +24,5 @@ public class BreakBallWin : MonoBehaviour
     {
         yield return new WaitForSeconds(10f);
         breakBall = true;
-
     }
 }

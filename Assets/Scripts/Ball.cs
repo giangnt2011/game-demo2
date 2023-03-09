@@ -10,6 +10,10 @@ public class Ball : MonoBehaviour
     [SerializeField] private Transform ballCollection;
     [SerializeField] private Transform ballPool;
 
+    private void OnDisable()
+    {
+        Destroy(gameObject);
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ball"))
@@ -39,6 +43,15 @@ public class Ball : MonoBehaviour
             {
                 transform.SetParent(ballPool, true);
             }
+            
         }
+    }
+
+    public void InitBall(Transform gameObjectTrans, Transform ballCol, Transform ballP)
+    {
+        gameObjectTransform = gameObjectTrans;
+        ballCollection = ballCol;
+        ballPool = ballP;
+
     }
 }

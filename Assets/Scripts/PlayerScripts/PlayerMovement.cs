@@ -8,17 +8,29 @@ namespace PlayerScripts
     {
         public static PlayerMovement instance;
         [SerializeField] private GameObject SmokeMovingPrefab;
+        [SerializeField] private Transform gameObjectTrsPlayer;
         [SerializeField] private Animator _animator;
         [SerializeField] private Transform ballCollectionTransform;
+        [SerializeField] private Transform ballPool; 
         [SerializeField] private float speed = 10f;
         [SerializeField] private float stepWin;
         [SerializeField] private Slider Sliderslider;
-        bool win = false;
+        [SerializeField] private GameObject NextLevel;
+        [SerializeField] private GameObject ReplayTxt;
+        [SerializeField] private GameObject[] BallPrefabs;
+        [SerializeField] private Transform StickmanTrans;
+
+        public bool win = false;
+        public bool RotateCamera = false;
         private bool isMoving = false;
         
         private Touch touch;
         private float deltaTouchBefore = 0f;
         public Vector3 EndPoint;
+
+
+
+
         private bool active { get; set; }
 
         // private void Update()
@@ -31,26 +43,56 @@ namespace PlayerScripts
         {
             instance = this;
         }
+
+        private void OnEnable()
+        {
+            EventDispatcher.Instance.RegisterListener(EventID.LoadLevel, HandleEventLoadLevel);
+        }
+        private void OnDisable()
+        {
+            EventDispatcher.Instance.RemoveListener(EventID.LoadLevel, HandleEventLoadLevel);
+        }
         private void Update()
         {
+            if (ballCollectionTransform.childCount == 0 && win)
+            {
+                NextLevel.SetActive(true);
+            }
+            //} else if (ballCollectionTransform.childCount == 0)
+            //{
+            //    ReplayTxt.SetActive(true);
+            //    Time.timeScale = 0f;
+            //}
             if (win)
             {
                 Win();
                 return;
             }
             
-            if (isMoving)
+            if (isMoving && ballCollectionTransform.childCount > 1)
             {
                 GameObject game = Instantiate(SmokeMovingPrefab, ballCollectionTransform.GetChild(ballCollectionTransform.childCount - 1).position,
                     new Quaternion(0, 1, 1, 1));
-
-                StartCoroutine(destroyPrefab(game));
+                Destroy(game, 0.5f);
             }
             
+            if(Input.GetMouseButtonDown(0))
+            {
+                EnableMoving(true);
+            }
+
             GetTouchMove();
             if (isMoving)
             {
                 MovePlayer();
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.CompareTag("EndPoint"))
+            {
+                RotateCamera = true;
             }
         }
 
@@ -64,7 +106,7 @@ namespace PlayerScripts
             if (Input.touchCount > 0)
             {
                 touch = Input.GetTouch(0);
-                isMoving = true;
+                
 
                 if (touch.phase == TouchPhase.Moved)
                 {
@@ -86,12 +128,17 @@ namespace PlayerScripts
             }
         }
         
+        private void EnableMoving(bool moving)
+        {
+            isMoving = moving;
+        }
+
         void MovePlayer()
         {
             var position = transform.position;
             position = Vector3.MoveTowards(position,new Vector3(Sliderslider.value, 0, position.z + 0.5f), speed * Time.deltaTime);
             transform.position = position;
-            _animator.SetBool("Run", true);
+            SetAnimation(AnimState.Run);
         }
         
         private void Win()
@@ -114,13 +161,68 @@ namespace PlayerScripts
         IEnumerator SwitchAnimation()
         {
             yield return new WaitForSeconds(.8f);
-            _animator.SetBool("Run", false);
-            _animator.SetBool("Dance", true);
+            SetAnimation(AnimState.Dance);
         }
         private void EnableDriving(bool enable)
         {
             active = enable;
         }
 
+        private void HandleEventLoadLevel(object param)
+        {
+            //set vi tri
+            LevelController currentLevel = (LevelController)param;
+            SetEndPoint(currentLevel.EndPlayer.position);
+
+            ballCollectionTransform.localPosition = Vector3.zero; 
+            gameObjectTrsPlayer.localPosition= Vector3.zero;
+            StickmanTrans.localPosition = Vector3.up;
+
+            GameObject ballInstantiate = Instantiate(BallPrefabs[Random.Range(0, BallPrefabs.Length)], Vector3.zero, Quaternion.identity);
+            transform.position = currentLevel.StartPlayer.position;
+            ballInstantiate.transform.SetParent(ballCollectionTransform, true);
+
+            Ball ballScript = ballInstantiate.gameObject.transform.GetComponent<Ball>();
+            ballScript.InitBall(gameObjectTrsPlayer, ballCollectionTransform, ballPool);
+
+            // set animation
+            SetAnimation(AnimState.Idle);
+
+            win = false;
+            RotateCamera = false;
+            isMoving= false;
+
+            CameraFollow.instance.ResetCamera();
+
+
+        }
+        private void SetAnimation(AnimState state)
+        {
+            switch (state)
+            {
+                case (AnimState.Idle):
+                    _animator.SetBool("Run", false);
+                    _animator.SetBool("Dance", false);
+                    break;
+                case (AnimState.Run):
+                    _animator.SetBool("Run", true);
+                    break;
+                case (AnimState.Dance):
+                    _animator.SetBool("Run", false);
+                    _animator.SetBool("Dance", true);
+                    break;
+                default:
+                    break;
+            }
+
+        }
     }
+
+    
+}
+public enum AnimState
+{
+    Idle,
+    Run,
+    Dance
 }

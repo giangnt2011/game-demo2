@@ -7,7 +7,7 @@ public class WinPoint : MonoBehaviour
     private const string PlayerTag = "Player";
     private void Start()
     {
-        PlayerMovement.instance.SetEndPoint(end.transform.position);
+        //PlayerMovement.instance.SetEndPoint(end.transform.position);
     }
     private void OnTriggerEnter(Collider other)
     {

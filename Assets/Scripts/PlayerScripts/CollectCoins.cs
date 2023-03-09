@@ -10,7 +10,7 @@ public class CollectCoins : MonoBehaviour
 
     private void Start()
     {
-        Score.text = "0";
+        UIController.instance.SetScoreTxt(0);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -18,10 +18,10 @@ public class CollectCoins : MonoBehaviour
         if (other.gameObject.CompareTag("Coin"))
         {
             other.gameObject.TryGetComponent<Coin>(out var coin);
-            if (coin.hasCollided)
+            if (!coin.hasCollided)
             {
                 CoinScore++;
-                Score.text = CoinScore.ToString();
+                UIController.instance.SetScoreTxt(CoinScore);
             }
         }
     }
